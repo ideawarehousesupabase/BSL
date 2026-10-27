@@ -1,0 +1,6 @@
+# Words select_words.py never chooses for Hand -> Speech: correct dictionary signs, but abstract,
+# technical or odd on their own in a conversation demo (they still play on Speech -> Sign).
+change-of-use annual frequency voltage probably if mine middle equal choice down make everything
+original allow decide update tax mean adult gold component digital module hardware software
+function factor potential variable formula ratio sampling specification render scale range
+current process system level type form unit period field matter view lead

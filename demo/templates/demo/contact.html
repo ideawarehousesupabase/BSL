@@ -1,0 +1,13 @@
+
+{% extends 'base.html' %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+<div class='form-wrap'>
+  <h2>Contact us</h2>
+  <form method='post'>{% csrf_token %}
+    <input name='email' type='email' placeholder='Your email (optional)'/>
+    <textarea name='message' rows='5' placeholder='Write your message...' required></textarea>
+    <button class='btn' type='submit'>Send</button>
+  </form>
+</div>
+{% endblock %}

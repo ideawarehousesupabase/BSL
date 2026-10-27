@@ -1,0 +1,33 @@
+
+<!doctype html><html lang='en'>
+<head>
+<meta charset='utf-8'/><meta name='viewport' content='width=device-width, initial-scale=1'/>
+<title>{% block title %}BSL Translator{% endblock %}</title>
+<link rel='stylesheet' href='/static/demo/style.css'/>
+</head>
+<body>
+<header class='nav'>
+  <div class='brand'>🖐️ BSL Translator</div>
+  <nav>
+    <a href='/'>Hand → Speech</a>
+    <a href='/speech-to-sign/'>Speech → Sign</a>
+    <a href='/subscription/'>Subscription</a>
+    <a href='/contact/'>Contact</a>
+    {% if user.is_authenticated %}
+      <span class='welcome'>Hi, {{ user.username }}</span>
+      <a href='/logout/'>Logout</a>
+    {% else %}
+      <a href='/login/'>Login</a>
+      <a href='/signup/'>Signup</a>
+    {% endif %}
+  </nav>
+</header>
+<main class='container'>
+  {% for m in messages %}<div class='flash'>{{ m }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<footer class='footer'>© 2026 BSL Translator Prototype
+  <div class='data-credit'>Sign videos: BSLDict, University of Oxford VGG (CC BY 4.0; video copyright remains with the original owners) · Synonyms: Princeton WordNet · Hand tracking and gesture model: Google MediaPipe (Apache 2.0)</div>
+</footer>
+</body>
+</html>

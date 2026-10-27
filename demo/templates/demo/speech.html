@@ -1,0 +1,43 @@
+
+{% extends 'base.html' %}
+{% block title %}Speech → Sign{% endblock %}
+{% block content %}
+<section class='hero'>
+  <h1>Speech → Sign (BSL video)</h1>
+  <p class='muted'>Speak in English. Each word is shown as a British Sign Language video clip; words without a clip are fingerspelled.</p>
+  <p class='muted small' id='speechStatus'>Loading the sign dictionary…</p>
+
+  <div class='controls-row'>
+    <button id='startRec' class='btn'>Start Listening</button>
+    <button id='stopRec' class='btn-outline'>Stop</button>
+    <button id='replaySigns' class='btn-outline'>Replay</button>
+    <button id='clearRec' class='btn-danger'>Clear</button>
+    <label class='muted'>Speed
+      <select id='signSpeed'>
+        <option value='0.75'>0.75×</option>
+        <option value='1' selected>1×</option>
+        <option value='1.25'>1.25×</option>
+        <option value='1.5'>1.5×</option>
+      </select>
+    </label>
+  </div>
+
+  <div class='result' id='heard'>Heard: —</div>
+
+  <div class='sign-stage'>
+    <video id='signPlayer' playsinline muted></video>
+    <div class='sign-caption' id='signCaption'>—</div>
+  </div>
+  <div class='sign-chips' id='signChips'></div>
+
+  <h3>Try saying</h3>
+  <ul>
+    <li>“Hello, how are you?”</li>
+    <li>“I need help, please”</li>
+    <li>“Thank you, doctor”</li>
+    <li>“Where is the toilet?”</li>
+    <li>Your name — it will be fingerspelled</li>
+  </ul>
+</section>
+<script type='module' src='/static/demo/speech_app.js'></script>
+{% endblock %}

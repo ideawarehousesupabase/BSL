@@ -1,0 +1,62 @@
+
+{% extends 'base.html' %}
+{% block title %}Hand → Speech{% endblock %}
+{% block content %}
+<section class='hero'>
+  <h1>Hand → Speech (with sentence builder)</h1>
+  <p class='muted'>Sign in front of the camera, then hold still or lower your hands to finish each sign. Every recognised sign is spoken.</p>
+  <p class='muted small' id='engineStatus'>Press Start to load sign recognition.</p>
+  <div class='video-wrap'>
+    <video id='video' autoplay playsinline muted></video>
+    <canvas id='overlay'></canvas>
+  </div>
+  <div class='video-controls'>
+    <button id='startCamera' class='btn'>Start</button>
+    <button id='stopCamera' class='btn-outline'>Stop</button>
+    <button id='resetLast' class='btn-outline'>Reset last</button>
+    <button id='resetAll' class='btn-danger'>Reset all</button>
+  </div>
+
+  <div id='confidence-bar'><div id='confidence-fill'></div></div>
+  <div class='result' id='result'>— waiting —</div>
+  <pre class='debug-info' id='debugInfo' hidden></pre>
+
+  <div class='sentence-container'>
+    <h3>Sentence Builder</h3>
+    <div id='sentenceBox' class='sentence-box'>(start signing...)</div>
+  </div>
+
+  <details style="margin-top:12px" open>
+    <summary>Calibrate my signs (recommended for best accuracy)</summary>
+    <p class='muted small'>Choose a sign, press Record and sign it 3 times. Your recordings are matched alongside the
+      dictionary examples, which makes recognition of your signing much more accurate. They stay in this browser only.</p>
+    <div class='controls-row'>
+      <select id='calibSign' aria-label='Sign to calibrate'></select>
+      <button id='calibRecord' class='btn'>Record 3 times</button>
+      <button id='calibClear' class='btn-outline'>Clear my calibration</button>
+    </div>
+    <p class='muted small' id='calibHint'></p>
+    <video id='calibDemo' class='sign-demo' playsinline muted loop hidden></video>
+    <div class='result' id='calibStatus'>Start the camera, then record each sign 3 times. After each sign the next one is selected for you.</div>
+    <p class='muted small' id='calibList'></p>
+  </details>
+
+  <details style="margin-top:12px">
+    <summary>Signs I can recognise</summary>
+    <div class='sign-chips' id='knownSigns'><span class='muted small'>Loaded when you press Start.</span></div>
+    <video id='signDemo' class='sign-demo' playsinline muted controls hidden></video>
+  </details>
+
+  <details style="margin-top:12px">
+    <summary>Advanced tuning</summary>
+    <div class='controls-row'>
+      <label>Hold-still frames <input id="stability" type="range" min="4" max="20" value="10"/></label>
+      <label>Cooldown (ms) <input id="cooldown" type="range" min="200" max="1500" step="100" value="600"/></label>
+      <label>Confidence % <input id="confth" type="range" min="10" max="95" value="40"/></label>
+    </div>
+  </details>
+
+</section>
+<script src='/static/demo/unified_patterns.js'></script>
+<script type='module' src='/static/demo/script.js'></script>
+{% endblock %}

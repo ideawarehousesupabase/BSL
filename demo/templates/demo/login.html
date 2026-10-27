@@ -1,0 +1,14 @@
+
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class='form-wrap'>
+  <h2>Login</h2>
+  <form method='post'>{% csrf_token %}
+    <input name='username' placeholder='Username' required/>
+    <input name='password' type='password' placeholder='Password' required/>
+    <button class='btn' type='submit'>Login</button>
+  </form>
+  <p class='muted'>No account? <a href='/signup/'>Signup</a></p>
+</div>
+{% endblock %}

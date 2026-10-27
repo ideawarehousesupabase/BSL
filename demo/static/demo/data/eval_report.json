@@ -1,0 +1,248 @@
+{
+ "generated": "2026-10-27",
+ "method": "Fixed vocabulary from vocabulary.txt. Each clip, with 0.004 landmark jitter like live input, is matched against all other clips (never itself); accuracy_within_vocabulary is measured on 3 fresh jitter draws. No personal calibration (see scripts/test_calibration.mjs for that).",
+ "clips": 220,
+ "words_testable": 45,
+ "accuracy_all_testable_words": 0.712,
+ "vocabulary_size": 45,
+ "accuracy_within_vocabulary": 0.705,
+ "accept_threshold": 1.3981,
+ "params": {
+  "band": 3,
+  "shapeWeight": 1.5,
+  "orientWeight": 0.5,
+  "locWeight": 0.5,
+  "missingHandCost": 1.0,
+  "nondominantWeight": 0.6,
+  "dtwScale": 1.9976,
+  "embScale": 0.9967,
+  "embWeight": 2.0
+ },
+ "vocabulary": {
+  "agree": {
+   "correct": 11,
+   "tested": 15
+  },
+  "baby": {
+   "correct": 12,
+   "tested": 18
+  },
+  "black": {
+   "correct": 12,
+   "tested": 15
+  },
+  "boat": {
+   "correct": 9,
+   "tested": 12
+  },
+  "brother": {
+   "correct": 6,
+   "tested": 18
+  },
+  "cake": {
+   "correct": 18,
+   "tested": 18
+  },
+  "chocolate": {
+   "correct": 9,
+   "tested": 12
+  },
+  "choose": {
+   "correct": 7,
+   "tested": 15
+  },
+  "dark": {
+   "correct": 12,
+   "tested": 12
+  },
+  "date": {
+   "correct": 15,
+   "tested": 21
+  },
+  "daughter": {
+   "correct": 6,
+   "tested": 12
+  },
+  "dinner": {
+   "correct": 17,
+   "tested": 18
+  },
+  "donkey": {
+   "correct": 12,
+   "tested": 15
+  },
+  "door": {
+   "correct": 9,
+   "tested": 15
+  },
+  "england": {
+   "correct": 11,
+   "tested": 15
+  },
+  "father": {
+   "correct": 20,
+   "tested": 21
+  },
+  "fog": {
+   "correct": 9,
+   "tested": 18
+  },
+  "frog": {
+   "correct": 9,
+   "tested": 15
+  },
+  "fruit": {
+   "correct": 9,
+   "tested": 15
+  },
+  "goodbye": {
+   "correct": 9,
+   "tested": 12
+  },
+  "helicopter": {
+   "correct": 12,
+   "tested": 12
+  },
+  "how": {
+   "correct": 9,
+   "tested": 18
+  },
+  "how-much": {
+   "correct": 9,
+   "tested": 12
+  },
+  "i-understand": {
+   "correct": 12,
+   "tested": 15
+  },
+  "internet": {
+   "correct": 20,
+   "tested": 21
+  },
+  "interview": {
+   "correct": 6,
+   "tested": 12
+  },
+  "life": {
+   "correct": 6,
+   "tested": 12
+  },
+  "many": {
+   "correct": 6,
+   "tested": 12
+  },
+  "orange": {
+   "correct": 6,
+   "tested": 12
+  },
+  "own": {
+   "correct": 12,
+   "tested": 18
+  },
+  "partner": {
+   "correct": 9,
+   "tested": 15
+  },
+  "picture": {
+   "correct": 12,
+   "tested": 12
+  },
+  "plant": {
+   "correct": 7,
+   "tested": 15
+  },
+  "rabbit": {
+   "correct": 8,
+   "tested": 12
+  },
+  "rat": {
+   "correct": 12,
+   "tested": 12
+  },
+  "sad": {
+   "correct": 9,
+   "tested": 12
+  },
+  "stop": {
+   "correct": 9,
+   "tested": 12
+  },
+  "sunday": {
+   "correct": 15,
+   "tested": 15
+  },
+  "tea": {
+   "correct": 3,
+   "tested": 15
+  },
+  "temperature": {
+   "correct": 15,
+   "tested": 15
+  },
+  "tool": {
+   "correct": 7,
+   "tested": 12
+  },
+  "weekend": {
+   "correct": 3,
+   "tested": 12
+  },
+  "what": {
+   "correct": 12,
+   "tested": 12
+  },
+  "when": {
+   "correct": 12,
+   "tested": 15
+  },
+  "yesterday": {
+   "correct": 12,
+   "tested": 18
+  }
+ },
+ "held_shapes": {
+  "method": "Still part of each clip (wrist still for at least 5 frames) averaged into one hand-shape example; each one, jittered, matched against all other examples of the held-shape words only (never itself), 3 fresh jitter draws.",
+  "examples": 36,
+  "vocabulary_size": 9,
+  "accuracy_within_vocabulary": 0.972,
+  "accept_threshold": 1.1538,
+  "vocabulary": {
+   "boat": {
+    "correct": 6,
+    "tested": 6
+   },
+   "england": {
+    "correct": 12,
+    "tested": 12
+   },
+   "father": {
+    "correct": 18,
+    "tested": 18
+   },
+   "frog": {
+    "correct": 12,
+    "tested": 12
+   },
+   "helicopter": {
+    "correct": 9,
+    "tested": 9
+   },
+   "i-understand": {
+    "correct": 12,
+    "tested": 15
+   },
+   "rabbit": {
+    "correct": 12,
+    "tested": 12
+   },
+   "sunday": {
+    "correct": 12,
+    "tested": 12
+   },
+   "temperature": {
+    "correct": 12,
+    "tested": 12
+   }
+  }
+ }
+}

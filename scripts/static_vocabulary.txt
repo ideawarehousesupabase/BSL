@@ -1,0 +1,7 @@
+# Signs also recognised from a HELD hand shape (no movement): make the hand shape at its place and hold
+# it still for about a second. = the Hand -> Speech words (vocabulary.txt) whose held shape is matched
+# correctly at least 75% of the time against the other dictionary clips (build_index.py, eval_report.json),
+# except cake, daughter and orange: held still they look like the demo gestures Four / Stop / Three
+# (scripts/test_held.mjs), so they are recognised from their movement only.
+# build_index.py --static-vocab uses exactly these words.
+boat england father frog helicopter i-understand rabbit sunday temperature

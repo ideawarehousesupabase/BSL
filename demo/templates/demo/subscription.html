@@ -1,0 +1,23 @@
+
+{% extends 'base.html' %}
+{% block title %}Subscription{% endblock %}
+{% block content %}
+<section class='hero'>
+  <h2>Your Subscriptions</h2>
+  <div class='plans'>
+    <form method='post'>{% csrf_token %}
+      <button class='card' name='plan' value='Free' type='submit'>Free</button>
+      <button class='card' name='plan' value='Pro' type='submit'>Pro (£5)</button>
+      <button class='card' name='plan' value='Enterprise' type='submit'>Enterprise (£10)</button>
+    </form>
+  </div>
+  <h3>History</h3>
+  <ul>
+    {% for p in plans %}
+      <li>{{ p.created_at|date:"Y-m-d H:i" }} — {{ p.plan }}</li>
+    {% empty %}
+      <li>No subscriptions yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
