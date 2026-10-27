@@ -1,12 +1,10 @@
 
-import random
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
 
 from .models import Subscription, Feedback
 
@@ -71,9 +69,3 @@ def contact_view(request):
         messages.success(request, "Thanks! We'll get back to you.")
         return redirect('contact')
     return render(request, 'demo/contact.html')
-
-def translate_api(request):
-    return JsonResponse({
-        'translation': random.choice(['Hello there!', 'How are you?', 'Please help me.', 'Nice to meet you.']),
-        'confidence': random.choice([72, 81, 89, 93])
-    })

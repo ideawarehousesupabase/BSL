@@ -5,14 +5,14 @@ Outputs (in demo/static/demo/data/):
   sign_templates.json  landmark templates for the recognisable vocabulary, used by Sign -> Speech
   eval_report.json     held-out accuracy, so the numbers shown to the client are measured
 
-How the recognisable vocabulary is chosen (no training):
-  every clip (with small landmark jitter, like live camera input) is matched against all other
-  clips (never itself), so each test uses a signer or source the word's other examples came from. The word that is matched worst is dropped and
-  the test is repeated, until every remaining word is recognised at least MIN_ACCURACY of the time.
+The recognised words come from scripts/vocabulary.txt (chosen by select_words.py). Accuracy is measured
+by matching every clip (with small landmark jitter, like live camera input) against all other clips
+(never itself), so each test uses a signer or source the word's other examples came from.
 
 Usage:
     python build_index.py --meta bsldict_meta.json --clips <project>/media/signs \
-        --landmarks <landmark_dir> --out <project>/demo/static/demo/data
+        --landmarks <landmark_dir> --out <project>/demo/static/demo/data --vocab vocabulary.txt \
+        [--static-vocab static_vocabulary.txt] [--embedding sign_embedding.json --emb-weight 2]
 """
 import argparse
 import collections
@@ -28,10 +28,9 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sign_features as sf  # noqa: E402
 
-MIN_ACCURACY = 0.5   # a word stays in the vocabulary if at least half its held-out clips match it
 MIN_CLIPS = 2        # a word needs at least two clips so it can be tested
 TEST_NOISE = 0.004   # jitter added to test clips, similar to live-camera landmark noise
-SELECT_DRAWS = 3     # jittered copies of each clip used to choose the vocabulary
+SELECT_DRAWS = 3     # jittered copies of each clip used to set the accept threshold
 REPORT_DRAWS = 3     # fresh jittered copies (different seed) used only to report accuracy
 STATIC_HOLD = 5      # a clip gives a held-shape example if the wrist stays still this many frames (0.2 s)
 STATIC_STILL = 0.06  # wrist movement per frame (in palm widths, after smoothing) that still counts as held
@@ -166,20 +165,6 @@ def static_distances(items: list[dict], seed: int) -> np.ndarray:
     return D
 
 
-def select_vocabulary(Ds: list[np.ndarray], words: np.ndarray) -> tuple[set, dict, list[float], dict]:
-    counts = collections.Counter(words)
-    vocab = {w for w, n in counts.items() if n >= MIN_CLIPS}
-    all_words, _ = held_out(Ds, words, vocab)
-    while vocab:
-        per_word, right = held_out(Ds, words, vocab)
-        # ties broken by word so the result is the same on every run
-        worst = min(sorted(vocab), key=lambda w: per_word[w][0] / per_word[w][1])
-        if per_word[worst][0] / per_word[worst][1] >= MIN_ACCURACY:
-            return vocab, per_word, right, all_words
-        vocab.discard(worst)
-    return set(), {}, [], all_words
-
-
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--meta", type=Path, required=True)
@@ -187,7 +172,7 @@ def main() -> None:
     p.add_argument("--landmarks", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--media-url", default="/media/signs/")
-    p.add_argument("--vocab", type=Path, help="fixed list of words for Hand -> Speech (skips automatic selection)")
+    p.add_argument("--vocab", type=Path, required=True, help="words recognised on Hand -> Speech (vocabulary.txt)")
     p.add_argument("--static-vocab", type=Path, help="words also recognised from a held hand shape (no movement)")
     p.add_argument("--embedding", type=Path, help="sign_embedding.json from train_embedding.py (combined with DTW)")
     p.add_argument("--emb-weight", type=float, default=1.0, help="weight of the embedding against DTW")
@@ -221,13 +206,10 @@ def main() -> None:
     (a.out / "sign_clips.json").write_text(json.dumps(clip_index, indent=0), encoding="utf-8")
     print(f"sign_clips.json: {len(clips)} words, {sum(map(len, clips.values()))} clips")
 
-    # Sign -> Speech: choose the vocabulary the matcher can reliably tell apart
-    templates = load_templates(a.landmarks)
-    fixed = None
-    if a.vocab:
-        fixed = {w for line in a.vocab.read_text(encoding="utf-8").splitlines()
-                 if not line.lstrip().startswith("#") for w in line.split()}
-        templates = [t for t in templates if t["word"] in fixed]  # only the fixed words need comparing
+    # Sign -> Speech: examples of the vocabulary words
+    fixed = {w for line in a.vocab.read_text(encoding="utf-8").splitlines()
+             if not line.lstrip().startswith("#") for w in line.split()}
+    templates = [t for t in load_templates(a.landmarks) if t["word"] in fixed]
     words = np.array([t["word"] for t in templates])
     model = None
     if a.embedding:
@@ -241,22 +223,15 @@ def main() -> None:
         sf.EMB_WEIGHT = a.emb_weight
         print(f"embedding: weight {sf.EMB_WEIGHT}, scales dtw {sf.DTW_SCALE} / embedding {sf.EMB_SCALE}")
     select_Ds = [distance_matrix(templates, seed, model) for seed in range(SELECT_DRAWS)]
-    if fixed:
-        vocab = {w for w in fixed if w in set(words)}
-        _, right = held_out(select_Ds, words, vocab)
-        all_words, _ = held_out(select_Ds, words, vocab)
-        missing = sorted(fixed - vocab)
-        if missing:
-            print("warning: no clips for", missing)
-    else:
-        vocab, _, right, all_words = select_vocabulary(select_Ds, words)
-    # Report accuracy on fresh jitter draws, so the figure is not flattered by the selection.
+    vocab = {w for w in fixed if w in set(words)}
+    _, right = held_out(select_Ds, words, vocab)
+    if fixed - vocab:
+        print("warning: no clips for", sorted(fixed - vocab))
+    # Report accuracy on fresh jitter draws (not the ones that set the threshold).
     report_Ds = [distance_matrix(templates, 100 + seed, model) for seed in range(REPORT_DRAWS)]
     per_word, _ = held_out(report_Ds, words, vocab) if vocab else ({}, [])
     tested = sum(n for _, n in per_word.values())
     correct = sum(ok for ok, _ in per_word.values())
-    all_tested = sum(n for _, n in all_words.values())
-    all_correct = sum(ok for ok, _ in all_words.values())
     threshold = round(float(np.quantile(right, 0.9)), 4) if right else 1.0
 
     signs = collections.defaultdict(list)
@@ -319,15 +294,11 @@ def main() -> None:
 
     report = {
         "generated": date.today().isoformat(),
-        "method": (f"Fixed vocabulary from {a.vocab.name}. " if fixed else
-                   f"Vocabulary = words still recognised at least {MIN_ACCURACY:.0%} of the time "
-                   f"({SELECT_DRAWS} jitter draws) after repeatedly removing the worst word. ")
-                  + f"Each clip, with {TEST_NOISE} landmark jitter like live input, is matched against all other "
+        "method": f"Vocabulary from {a.vocab.name}. "
+                  f"Each clip, with {TEST_NOISE} landmark jitter like live input, is matched against all other "
                   f"clips (never itself); accuracy_within_vocabulary is measured on {REPORT_DRAWS} fresh jitter draws. "
                   "No personal calibration (see scripts/test_calibration.mjs for that).",
         "clips": len(templates),
-        "words_testable": len(all_words),
-        "accuracy_all_testable_words": round(all_correct / all_tested, 3) if all_tested else None,
         "vocabulary_size": len(vocab),
         "accuracy_within_vocabulary": round(correct / tested, 3) if tested else None,
         "accept_threshold": threshold,
@@ -336,8 +307,7 @@ def main() -> None:
         "held_shapes": static_report,
     }
     (a.out / "eval_report.json").write_text(json.dumps(report, indent=1), encoding="utf-8")
-    print(f"templates: {len(templates)} | testable words: {len(all_words)} "
-          f"(top-1 {report['accuracy_all_testable_words']}) | vocabulary: {len(vocab)} words "
+    print(f"templates: {len(templates)} | vocabulary: {len(vocab)} words "
           f"(held-out top-1 {report['accuracy_within_vocabulary']}) | threshold {threshold}")
     print("vocabulary:", " ".join(sorted(vocab)))
 

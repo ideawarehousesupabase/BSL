@@ -155,9 +155,6 @@ where each sign starts and stops, saves the trimmed clip as `media/signs/<word>/
 first on Speech → Sign) and adds the examples for Hand → Speech. Get written consent from everyone
 recorded.
 
-Optional: `scripts/tune_params.py --landmarks landmarks` re-tunes the matching weights.
-Copy the printed values into `scripts/sign_features.py`, then re-run `build_index.py`.
-
 ## Keeping Python and JavaScript in step
 
 `scripts/sign_features.py` (offline) and `demo/static/demo/sign_matcher.js` (browser) implement

@@ -2,17 +2,17 @@
 BSL Translator — Full Stack (Django + Frontend, Hand→Speech & Speech→Sign) — 2025-11-08
 
 ## Features
-- Hand→Speech: MediaPipe hand + body landmarks (tasks-vision 1.1.1). Signs are matched against real BSL
-  dictionary clips (BSLDict) by comparing hand movement. No AI model is trained. Every recognised sign is spoken
-  in a British English voice; sign sequences can form full sentences (unified_patterns.js). The original
-  demo gestures still work as a fallback. Confidence is measured, not fixed.
-  Recognises a fixed set of 44 signs (scripts/vocabulary.txt + 9 demo gestures). For best accuracy use
-  "Calibrate my signs": sign each word 3 times; the recordings stay in the user's browser.
-- Speech→Sign: British English speech recognition -> BSL video clips played in order, word by word, with
-  phrases, word roots and synonyms. Words without a clip are fingerspelled (a–z). No emoji.
+- Hand→Speech: MediaPipe hand + body landmarks and Google's gesture recogniser (tasks-vision 1.1.1). Signs are
+  matched against real BSL dictionary clips (BSLDict) by comparing hand movement, helped by a small neural
+  network (sign embedding) that runs in the browser; no video leaves the device. Recognises 45 BSL words
+  (scripts/vocabulary.txt, listed on the page under "Signs I can recognise") + 9 demo gestures. Every
+  recognised sign is spoken in a British English voice; sign sequences can form full sentences
+  (unified_patterns.js). Confidence is measured, not fixed. Optional "Calibrate my signs": sign each word
+  3 times; the recordings stay in the user's browser.
+- Speech→Sign: British English speech recognition -> BSL video clips (1,162 words) played in order, word by
+  word, with phrases, word roots and synonyms. Words without a clip are fingerspelled (a–z). No emoji.
 - Auth: login, signup, logout (Django).
 - Subscription + Contact (DB-backed). Migrations included.
-- Optional ML training path (TFJS) if you want to replace rule-based logic later.
 
 ## Setup
 1) Create venv & install:
@@ -39,13 +39,10 @@ BSL Translator — Full Stack (Django + Frontend, Hand→Speech & Speech→Sign)
    - Contact: /contact
 
 ## Notes
-- Hand→Speech: demo/static/demo/script.js (page), sign_matcher.js (matching), gesture_rules.js (demo gestures)
+- Hand→Speech: demo/static/demo/script.js (page), sign_session.js (splits signs), sign_matcher.js (matching),
+  gesture_rules.js (demo gestures Three/Four), calibration.js (personal calibration)
 - Speech→Sign: demo/static/demo/speech_app.js (page/player), speech_lookup.js (word lookup)
 - Sign data (clips, templates, synonyms) and how to rebuild/extend it: README_DATA.md
 - Use Chrome or Edge (speech recognition is not available in Firefox).
-
-## Optional: ML Training (local)
-- Use a separate data capture tool (not included in Django app here) or repurpose front-end landmarks capture.
-- Convert to TFJS and drop files into demo/static/demo/model_tfjs/
 
 Enjoy!

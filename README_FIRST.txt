@@ -48,4 +48,4 @@ STOP SERVER
 Press Ctrl+C in the Command Prompt window.
 
 IMPORTANT
-TensorFlow is NOT in requirements.txt. It is not required to run this version and was the reason the previous Windows installation failed. This demo uses MediaPipe hand/body landmarks and matches them against recorded BSL dictionary clips (no AI training). Recognition covers a limited vocabulary; see demo/static/demo/data/eval_report.json for measured accuracy and README_DATA.md to rebuild or extend the sign data.
+TensorFlow is NOT in requirements.txt. It is not required to run this version and was the reason the previous Windows installation failed. This demo uses MediaPipe hand/body landmarks and matches them against recorded BSL dictionary clips, helped by a small neural network that runs in the browser (trained offline, nothing to install). Recognition covers a limited vocabulary; see demo/static/demo/data/eval_report.json for measured accuracy and README_DATA.md to rebuild or extend the sign data.

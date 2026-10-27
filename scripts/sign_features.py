@@ -26,7 +26,7 @@ N_ORIENT = 5             # pointing direction (x, y) + palm normal (x, y, z)
 SLOT_DIM = 1 + N_SHAPE + N_ORIENT + 2   # present, shape, orientation, location
 FRAME_DIM = 2 * SLOT_DIM + 1            # dominant hand, other hand, has-body flag
 
-# Matching weights (tuned with tune_params.py; written into sign_templates.json for the browser)
+# Matching weights (written into sign_templates.json for the browser)
 BAND = 3                 # DTW warping window
 SHAPE_WEIGHT = 1.5
 ORIENT_WEIGHT = 0.5
@@ -159,12 +159,8 @@ def query_variants(frames):
     """The live sequence read with each hand as the dominant one.
 
     For two-handed signs both hands move, so which one counts as dominant can flip between
-    recordings; matching takes the closer of the two readings (see best_distance)."""
+    recordings; matching takes the closer of the two readings."""
     return [s for s in (sequence_vectors(frames, "Right"), sequence_vectors(frames, "Left")) if s]
-
-
-def best_distance(variants, template):
-    return min(dtw(v, template) for v in variants)
 
 
 def static_vector(frames, dom):

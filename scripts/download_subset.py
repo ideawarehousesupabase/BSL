@@ -1,7 +1,7 @@
 """Download the BSLDict videos for the words in a word list.
 
 Usage:
-    python download_subset.py --meta bsldict_meta.json --words wordlist_mvp.txt --out <raw_video_dir>
+    python download_subset.py --meta bsldict_meta.json --words wordlist_candidates.txt --out <raw_video_dir>
 
 `bsldict_meta.json` is produced from BSLDict's bsldict_v1.pkl (see README_DATA.md).
 Hosted videos are fetched over HTTPS; YouTube-hosted ones via yt-dlp.

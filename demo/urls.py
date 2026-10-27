@@ -12,6 +12,4 @@ urlpatterns = [
 
     path('subscription/', views.subscription_view, name='subscription'),
     path('contact/', views.contact_view, name='contact'),
-
-    path('translate/', views.translate_api, name='translate_api'),
 ]
