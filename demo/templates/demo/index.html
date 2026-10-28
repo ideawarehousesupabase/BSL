@@ -43,8 +43,10 @@
 
   <details style="margin-top:12px">
     <summary>Signs I can recognise</summary>
+    <input id='signSearch' type='search' class='sign-search' placeholder='Search signs' aria-label='Search signs' autocomplete='off'>
     <div class='sign-chips' id='knownSigns'><span class='muted small'>Loaded when you press Start.</span></div>
-    <video id='signDemo' class='sign-demo' playsinline muted controls hidden></video>
+    <p class='result' id='signHint' hidden></p>
+    <video id='signDemo' class='sign-demo' playsinline muted controls loop hidden></video>
   </details>
 
   <details style="margin-top:12px">

@@ -1,4 +1,4 @@
 # Signs recognised on the Hand -> Speech page (BSLDict spelling), chosen by select_words.py from
 # the common dictionary words in wordlist_candidates.txt: the ones the matcher tells apart best.
-# build_index.py --vocab uses exactly these words. The 9 demo gestures are separate.
-agree baby black boat brother cake chocolate choose dark date daughter dinner donkey door england father fog frog fruit goodbye helicopter how how-much i-understand internet interview life many orange own partner picture plant rabbit rat sad stop sunday tea temperature tool weekend what when yesterday
+# build_index.py --vocab uses exactly these words. The 8 demo gestures are separate.
+agree baby black boat brother cake chocolate choose dark date daughter dinner donkey door england father fog frog fruit helicopter how how-much i-understand internet interview life many orange own partner picture plant rabbit rat sad stop sunday tea temperature tool weekend what when yesterday

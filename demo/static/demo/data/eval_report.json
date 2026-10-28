@@ -1,12 +1,10 @@
 {
- "generated": "2026-10-27",
- "method": "Fixed vocabulary from vocabulary.txt. Each clip, with 0.004 landmark jitter like live input, is matched against all other clips (never itself); accuracy_within_vocabulary is measured on 3 fresh jitter draws. No personal calibration (see scripts/test_calibration.mjs for that).",
- "clips": 220,
- "words_testable": 45,
- "accuracy_all_testable_words": 0.712,
- "vocabulary_size": 45,
- "accuracy_within_vocabulary": 0.705,
- "accept_threshold": 1.3981,
+ "generated": "2026-10-28",
+ "method": "Vocabulary from vocabulary.txt. Each clip, with 0.004 landmark jitter like live input, is matched against all other clips (never itself); accuracy_within_vocabulary is measured on 3 fresh jitter draws. No personal calibration (see scripts/test_calibration.mjs for that).",
+ "clips": 216,
+ "vocabulary_size": 44,
+ "accuracy_within_vocabulary": 0.718,
+ "accept_threshold": 1.4201,
  "params": {
   "band": 3,
   "shapeWeight": 1.5,
@@ -14,8 +12,8 @@
   "locWeight": 0.5,
   "missingHandCost": 1.0,
   "nondominantWeight": 0.6,
-  "dtwScale": 1.9976,
-  "embScale": 0.9967,
+  "dtwScale": 2.0051,
+  "embScale": 0.997,
   "embWeight": 2.0
  },
  "vocabulary": {
@@ -48,7 +46,7 @@
    "tested": 12
   },
   "choose": {
-   "correct": 7,
+   "correct": 13,
    "tested": 15
   },
   "dark": {
@@ -60,7 +58,7 @@
    "tested": 21
   },
   "daughter": {
-   "correct": 6,
+   "correct": 7,
    "tested": 12
   },
   "dinner": {
@@ -76,11 +74,11 @@
    "tested": 15
   },
   "england": {
-   "correct": 11,
+   "correct": 12,
    "tested": 15
   },
   "father": {
-   "correct": 20,
+   "correct": 18,
    "tested": 21
   },
   "fog": {
@@ -88,16 +86,12 @@
    "tested": 18
   },
   "frog": {
-   "correct": 9,
+   "correct": 10,
    "tested": 15
   },
   "fruit": {
    "correct": 9,
    "tested": 15
-  },
-  "goodbye": {
-   "correct": 9,
-   "tested": 12
   },
   "helicopter": {
    "correct": 12,
@@ -116,7 +110,7 @@
    "tested": 15
   },
   "internet": {
-   "correct": 20,
+   "correct": 19,
    "tested": 21
   },
   "interview": {
@@ -140,7 +134,7 @@
    "tested": 18
   },
   "partner": {
-   "correct": 9,
+   "correct": 8,
    "tested": 15
   },
   "picture": {
@@ -148,7 +142,7 @@
    "tested": 12
   },
   "plant": {
-   "correct": 7,
+   "correct": 9,
    "tested": 15
   },
   "rabbit": {
@@ -172,7 +166,7 @@
    "tested": 15
   },
   "tea": {
-   "correct": 3,
+   "correct": 5,
    "tested": 15
   },
   "temperature": {
@@ -180,7 +174,7 @@
    "tested": 15
   },
   "tool": {
-   "correct": 7,
+   "correct": 6,
    "tested": 12
   },
   "weekend": {
@@ -196,7 +190,7 @@
    "tested": 15
   },
   "yesterday": {
-   "correct": 12,
+   "correct": 13,
    "tested": 18
   }
  },

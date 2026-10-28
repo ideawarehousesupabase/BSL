@@ -89,7 +89,11 @@ const indexReady = fetch(TEMPLATES)
   .catch(() => ({ signs: [], threshold: 1 }))
   .then(data => { index = data; applyIndex(); showKnownSigns(); fillCalibration(); return data; });
 
-function applyIndex() { session.set('index', mergeIndex(index, personal)); }
+// recordings of signs no longer offered (e.g. the removed "Stop" demo gesture) are ignored
+function applyIndex() {
+  const known = new Set(allLabels().map(keyFor));
+  session.set('index', mergeIndex(index, Object.fromEntries(Object.entries(personal).filter(([k]) => known.has(k)))));
+}
 
 // Words that can be signed by holding the hand shape still (no movement needed).
 const heldWords = () => new Set((index.static?.signs || []).map(s => s.word));
@@ -143,6 +147,52 @@ async function rebuildModels() {
   }
 }
 
+// Hides the sign chips that do not contain the search text.
+function filterKnownSigns() {
+  const q = (document.getElementById('signSearch')?.value || '').trim().toLowerCase();
+  let shown = 0;
+  for (const c of knownList.querySelectorAll('.chip')) {
+    c.hidden = !c.textContent.toLowerCase().includes(q);
+    if (!c.hidden) shown++;
+  }
+  const empty = knownList.querySelector('.sign-empty');
+  if (empty) empty.hidden = shown > 0;
+}
+document.getElementById('signSearch')?.addEventListener('input', filterKnownSigns);
+
+// How to make each demo gesture (they are not in BSLDict, so there is no dictionary clip).
+const DEMO_HOWTO = {
+  'Hello': 'open hand, palm to the camera, fingers and thumb spread, wave side to side.',
+  'Four': 'four fingers straight, thumb folded across the palm, palm to the camera, hold still.',
+  'Three': 'index, middle and ring fingers straight, thumb and little finger folded, hold still.',
+  'Peace': 'index and middle fingers up in a V, other fingers and thumb folded, hold still.',
+  'Help': 'index finger pointing up, other fingers and thumb folded, hold still.',
+  'Good job': 'fist with the thumb pointing up, hold still.',
+  'No': 'fist with the thumb pointing down, hold still.',
+  'Love': 'thumb, index and little finger straight, middle and ring fingers folded, palm to the camera, hold still.',
+};
+const DEMO_EMOJI = { 'Hello': '👋', 'Four': '4️⃣', 'Three': '3️⃣', 'Peace': '✌️', 'Help': '☝️', 'Good job': '👍', 'No': '👎', 'Love': '🤟' };
+const withEmoji = g => `${DEMO_EMOJI[g] || ''} ${g}`.trim();
+
+// Sentences made from demo gestures (see unified_patterns.js); the video shows the sentence in BSL,
+// played from the dictionary clips of these words.
+const DEMO_SENTENCES = [
+  { sentence: 'Do you understand me?', gestures: ['Three', 'Peace'], bsl: ['you', 'understand', 'me'] },
+  { sentence: 'Thank you for helping me.', gestures: ['Help', 'Good job'], bsl: ['help', 'me', 'thank-you'] },
+];
+
+// Plays one clip on repeat, or several clips one after another, starting again after the last.
+function playClips(video, urls) {
+  if (!video || !urls.length) return;
+  let i = 0;
+  video.onerror = null;
+  video.loop = urls.length === 1;
+  video.onended = urls.length === 1 ? null : () => { i = (i + 1) % urls.length; video.src = urls[i]; video.play().catch(() => {}); };
+  video.hidden = false;
+  video.src = urls[0];
+  video.play().catch(() => {});
+}
+
 // Lists the recognisable signs; clicking a dictionary sign plays its clip so the user can copy it.
 async function showKnownSigns() {
   if (!knownList) return;
@@ -159,13 +209,53 @@ async function showKnownSigns() {
     b.textContent = s.label;
     if (held.has(s.word)) b.title = 'Can also be signed by holding its hand shape still';
     const url = clips.words[s.word]?.clips[0];
-    if (url && demo) b.addEventListener('click', () => { demo.hidden = false; demo.src = url; demo.play().catch(() => {}); });
+    if (url && demo) b.addEventListener('click', () => playClips(demo, [url]));
     knownList.appendChild(b);
   }
+  const hint = document.getElementById('signHint');
+  for (const s of knownList.querySelectorAll('.chip')) s.addEventListener('click', () => { if (hint) hint.hidden = true; });
+  for (const g of RULE_GESTURES) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip chip-demo';
+    b.textContent = withEmoji(g);
+    b.title = 'Demo gesture (not a BSL sign)';
+    b.addEventListener('click', () => {
+      if (hint) { hint.hidden = false; hint.textContent = `${withEmoji(g)}: ${DEMO_HOWTO[g]}`; }
+      if (!demo) return;
+      // optional own recording: media/signs/demo/<gesture>.mp4 (e.g. good-job.mp4)
+      playClips(demo, [`/media/signs/demo/${g.toLowerCase().replace(/ /g, '-')}.mp4`]);
+      demo.onerror = () => { demo.hidden = true; };
+    });
+    knownList.appendChild(b);
+  }
+  for (const s of DEMO_SENTENCES) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip chip-demo';
+    b.textContent = s.sentence;
+    b.title = `Sign ${s.gestures.join(' then ')}`;
+    const urls = s.bsl.map(w => clips.words[w]?.clips[0]).filter(Boolean);
+    b.addEventListener('click', () => {
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent = `"${s.sentence}" — to make it here, sign ${s.gestures.map(withEmoji).join(' then ')}. ` +
+          `The video shows the sentence in BSL (${s.bsl.map(w => w.toUpperCase()).join(' ')}).`;
+      }
+      playClips(demo, urls);
+    });
+    knownList.appendChild(b);
+  }
+  const empty = document.createElement('p');
+  empty.className = 'muted small sign-empty';
+  empty.textContent = 'No matching sign.';
+  empty.hidden = true;
+  knownList.appendChild(empty);
+  filterKnownSigns();
   const note = document.createElement('p');
   note.className = 'muted small';
   note.textContent = (held.size ? 'Signs with a dashed border can also be signed without movement: make the hand shape at ' +
-    'its place and hold it still for about a second. ' : '') + `Demo gestures: ${RULE_GESTURES.join(', ')}. Click a sign above to see how to sign it.`;
+    'its place and hold it still for about a second. ' : '') + `Demo gestures (not BSL): ${RULE_GESTURES.map(withEmoji).join(', ')}. Click any sign or sentence above to see how to sign it.`;
   knownList.appendChild(note);
 }
 

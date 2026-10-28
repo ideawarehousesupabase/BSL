@@ -1,7 +1,6 @@
 // The original GestureFlow handshape rules, kept as a fallback for the demo gestures.
 // Changes from the first version:
-//  - "Stop" (still open hand) and "Hello" (waving open hand) are told apart by movement;
-//    before, "Stop" could never be reached.
+//  - "Hello" needs a waving open hand; a still open hand is nothing (the old "Stop" gesture was removed).
 //  - Thumb checks are measured relative to palm size, so they work at any camera distance.
 //  - Confidence is computed from how clearly each finger is straight or bent, not a fixed number.
 
@@ -49,7 +48,7 @@ export function classifyHand(lm, waving) {
   const conf = Math.round(50 + 49 * clarity);
   const four = f.index && f.middle && f.ring && f.pinky;
 
-  if (four && f.thumb) return { g: waving ? 'Hello' : 'Stop', c: conf };
+  if (four && f.thumb) return waving ? { g: 'Hello', c: conf } : { g: null, c: 0 };
   if (four && !f.thumb) return { g: 'Four', c: conf };
   if (!f.thumb && f.index && f.middle && f.ring && !f.pinky) return { g: 'Three', c: conf };
   if (f.index && f.middle && !f.ring && !f.pinky) return { g: 'Peace', c: conf };
@@ -63,4 +62,4 @@ export function classifyHand(lm, waving) {
   return { g: null, c: 0 };
 }
 
-export const RULE_GESTURES = ['Hello', 'Stop', 'Four', 'Three', 'Peace', 'Help', 'Good job', 'No', 'Love'];
+export const RULE_GESTURES = ['Hello', 'Four', 'Three', 'Peace', 'Help', 'Good job', 'No', 'Love'];

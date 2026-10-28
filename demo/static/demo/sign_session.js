@@ -23,7 +23,7 @@ const MOVE_REARM = 0.12;    // movement (per 40 ms) that starts the next sign af
 const EMA_TAU = 57.7;       // wrist smoothing time constant (half-way per 40 ms frame)
 
 // Google MediaPipe Gesture Recognizer labels -> the client's demo gesture names.
-// Open_Palm is "Stop" when held still and "Hello" when waving. Three and Four are not in Google's
+// Open_Palm is "Hello" when waving (nothing when held still). Three and Four are not in Google's
 // model, so they still come from gesture_rules.js.
 const GOOGLE_GESTURES = { Victory: 'Peace', Thumb_Up: 'Good job', Thumb_Down: 'No', Pointing_Up: 'Help', ILoveYou: 'Love' };
 const GOOGLE_MIN_SCORE = 0.6;
@@ -209,7 +209,8 @@ export class SignSession {
     const g = s.gesture;
     if (g && g.score >= GOOGLE_MIN_SCORE) {
       const c = Math.round(100 * g.score);
-      if (g.categoryName === 'Open_Palm') return { g: waving ? 'Hello' : 'Stop', c, google: true };
+      // a still open palm is no longer a demo gesture (it was "Stop", often fired by a hand at rest)
+      if (g.categoryName === 'Open_Palm') return waving ? { g: 'Hello', c, google: true } : { g: null, c: 0 };
       if (GOOGLE_GESTURES[g.categoryName]) return { g: GOOGLE_GESTURES[g.categoryName], c, google: true };
     }
     return s.raw ? classifyHand(s.raw, waving) : { g: null, c: 0 };
@@ -268,8 +269,10 @@ export class SignSession {
       const st = index?.static ? matchStatic(this.heldFrames(), index) : null;
       const stOk = st && !st.demo && st.distance <= this.o.distSlack * index.static.threshold && st.confidence >= confThresh;
       const voteOk = vote.g && vote.n >= Math.ceil(vote.total / 2);
+      const mv = voteOk && !vote.google && index?.signs.length ? matchSequence(this.signFrames(true), index) : null;
+      const mvOk = !!mv && mv.distance <= this.o.distSlack * index.threshold && mv.confidence >= confThresh;
       const last = this.segment[this.segment.length - 1]?.gesture;
-      this.o.onDebug?.({ path: 'held shape', movingMs: Math.round(this.movingMs()), vote: vote.counts,
+      this.o.onDebug?.({ path: 'held shape', movement: mv && { label: mv.label, confidence: mv.confidence, accepted: mvOk, next: mv.runnerUp }, movingMs: Math.round(this.movingMs()), vote: vote.counts,
         voteTotal: vote.total, voteFrom: vote.google ? 'google' : 'rules',
         google: last ? `${last.categoryName} ${Math.round(100 * last.score)}%` : 'none',
         heldWord: st && { label: st.demo ? `demo shape ${st.label}` : st.label, confidence: st.confidence, accepted: stOk, next: st.runnerUp,
@@ -281,6 +284,10 @@ export class SignSession {
         this.emit(vote.g, vote.conf, how);             // Google's recogniser is sure: a demo gesture
       } else if (stOk) {
         this.emit(st.label, st.confidence, how);
+      } else if (voteOk && !vote.google && mvOk) {
+        // only our rules read a demo gesture, so the hand may have just come to rest at the end of a moving sign
+        // (e.g. a flat hand after "tea" read as Stop): trust the dictionary movement if it matches
+        this.emit(mv.label, mv.confidence, `sign match${mv.runnerUp ? ` (next: ${mv.runnerUp})` : ''} · ${Math.round(this.o.now() - t0)} ms`);
       } else if (voteOk) {
         this.emit(vote.g, vote.conf, how);             // Three / Four, or a demo gesture Google was unsure of, from our rules
       } else {
